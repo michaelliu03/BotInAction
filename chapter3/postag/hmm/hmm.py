@@ -142,8 +142,7 @@ def cal_hmm_matrix(observation):
 
 
 if __name__ == '__main__':
-
-    input_str = "今天和明天我弹琴。"
+    input_str = "今天我在撰写实战对话机器人。"
     obs = seg(input_str).strip().split(' ')
     hid, init_p, trans_p, emit_p = cal_hmm_matrix(obs)
 
