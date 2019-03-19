@@ -30,7 +30,7 @@ def Character2Word(input_file, output_file):
     input_data.close()
     output_data.close()
 
-input_file=r'E:\self-project\BotInAction\data\chapter3\msr_training.utf8'
-output_file=r'E:\self-project\BotInAction\data\chapter3\msr_training_res.utf8'
+input_file=r'E:\self-project\BotInAction\data\chapter3\result.txt'
+output_file=r'E:\self-project\BotInAction\data\chapter3\msr_res_res.utf8'
 if __name__ == '__main__':
     Character2Word(input_file, output_file)
