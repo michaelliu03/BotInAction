@@ -7,37 +7,45 @@
 
 
 import jieba
-from pyhanlp import *
+from jpype import *
 
+import jpype
+from  jpype import *
 import os
-import codecs
 
 
-testCase = [
-    "我正在撰写实战对话机器人",
-    "王总和小丽结婚了",
-    "柯文哲纠正司仪“恭请市长”说法：别用封建语言",
-    "签约仪式前，秦光荣、李纪恒、仇和等一同会见了参加签约的企业家。",
-    "王国强、高峰先生和汪洋女士、张朝阳光着头、韩寒、小四",
-    "张浩和胡健康复员回家了",
-    "编剧邵钧林和稽道青说",
-    "这里有关天培的有关事迹",
-    "龚学平等领导,邓颖超生前",
-    "微软的比尔盖茨、Facebook的扎克伯格跟桑德博格",
-]
+a=u'D:\\DevProgram\\Java\\jdk1.8.0_211\\jre\\bin\\server\\jvm.dll'    #jvm.dll启动成功
+jarpath = os.path.abspath("D:\\liepin_project\\seg_lib\\ins-segmentation-0.0.1-jar-with-dependencies.jar")
+#jarpath = os.path.join(os.path.abspath('D:\\liepin_project\\seg_lib\\ins-segmentation-0.0.1-jar-with-dependencies.jar'), a)#第二个参数是jar包的路径
+jpype.startJVM(jpype.getDefaultJVMPath(), "-ea", "-Djava.class.path=%s" %(jarpath))#启动jvm
+
+#jpype.startJVM(a, "-Djava.class.path=D:\\liepin_project\\seg_lib\\ins-segmentation-0.0.1-jar-with-dependencies.jar")
+HanLP = JClass('com.hankcs.hanlp.HanLP')
+#print(HanLP.newSegment().seg('你好，欢迎在Python中调用HanLP的API'))
+
+testCases = [
+    "商品和服务",
+    "结婚的和尚未结婚的确实在干扰分词啊",
+    "买水果然后来世博园最后去世博会",
+    "中国的首都是北京",
+    "欢迎新老师生前来就餐",
+    "工信处女干事每月经过下属科室都要亲口交代24口交换机等技术性器件的安装工作",
+    "随着页游兴起到现在的页游繁盛，依赖于存档进行逻辑判断的设计减少了，但这块也不能完全忽略掉。"]
+
+
 
 jiebaSegList = []
 hanlpSegList =[]
 def jiebaSeg():
-    for sentence in testCase:
+    for sentence in testCases:
         seg_list = jieba.cut(sentence)
         jiebaSegList.extend(seg_list)
         #print( "/".join(seg_list))
     #return jiebaSegList
 
 def pyHanlpSeg():
-    for sentence in testCase:
-       seg_list = HanLP.segment("".join(sentence))
+    for sentence in testCases:
+       seg_list = HanLP.newSegment().seg("".join(sentence))
        for item in seg_list:
            hanlpSegList.append(item.word)
 
@@ -72,7 +80,7 @@ if __name__ == '__main__':
 
 
 
-
+jpype.shutdownJVM()
 
 
 
