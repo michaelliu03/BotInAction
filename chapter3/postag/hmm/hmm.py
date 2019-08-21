@@ -64,7 +64,7 @@ def viterbi(obs_len, states_len, init_p, trans_p, emit_p):
 
 def cal_hmm_matrix(observation):
     # 得到所有标签
-    word_pos_file = open('../../../data/chapter4/hmm_pos/ChineseDic.txt','r',encoding='utf-8').readlines()
+    word_pos_file = open('../../../data/chapter3/hmm_pos/ChineseDic.txt','r',encoding='utf-8').readlines()
     tags_num = {}
     for line in word_pos_file:
         word_tags = line.strip().split(',')[1:]
@@ -78,7 +78,7 @@ def cal_hmm_matrix(observation):
     emission_matrix = np.zeros((len(tags_list), len(observation)), dtype=float)
 
     # 计算转移矩阵和发射矩阵
-    word_file = open('../../../data/chapter4/hmm_pos/199801.txt','r',encoding='utf-8').readlines()
+    word_file = open('../../../data/chapter3/hmm_pos/199801.txt','r',encoding='utf-8').readlines()
     for line in word_file:
         if line.strip() != '':
             word_pos_list = line.strip().split('  ')
