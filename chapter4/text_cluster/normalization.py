@@ -38,7 +38,6 @@ def remove_stopwords(text):
 def normalize_corpus(corpus):
     normalized_corpus = []
     for text in corpus:
-
         text =" ".join(jieba.lcut(text))
         normalized_corpus.append(text)
 

@@ -41,13 +41,8 @@ def build_feature_matrix(documents, feature_type='frequency',
 
 def load_book_data():
     book_data = pd.read_csv(corpus_path)  # 读取文件
-    #print(book_data.head(3))  # title , tag , info , comments,content
     book_titles = book_data['title'].tolist()
-    #print(book_titles)
     book_content = book_data['content'].tolist()
-    #print(book_content)
-    #print('书名', book_titles[0])
-    #print('内容', book_content[0][:10])
     return book_titles,book_content,book_data
 
 def k_means(feature_matrix, num_clusters=10):
@@ -110,7 +105,7 @@ def plot_clusters(num_clusters, feature_matrix,
     # build cluster plotting data
     cluster_color_map = {}
     cluster_name_map = {}
-    for cluster_num, cluster_details in cluster_data[0:500].items():
+    for cluster_num, cluster_details in cluster_data[0:].items():
         # assign cluster features to unique label
         cluster_color_map[cluster_num] = generate_random_color()
         cluster_name_map[cluster_num] = ', '.join(cluster_details['key_features'][:5]).strip()
