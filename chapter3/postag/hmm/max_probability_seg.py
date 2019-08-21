@@ -17,7 +17,7 @@ def stopwordslist(filepath):
     return stopwords
 
 def remstopwords(sentences):
-    stopwords = stopwordslist('../../../data/chapter3/hmm_pos/stopwords.txt')
+    stopwords = stopwordslist('../../../data/chapter4/hmm_pos/stopwords.txt')
     outstr = ''
     for word in sentences:
         if word not in stopwords:

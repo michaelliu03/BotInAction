@@ -3,18 +3,19 @@
 # @File:Segment.py
 # @Author: Michael.liu
 # @Date:2019/2/12
-import jieba
+
 import re
 import string
-
-
+import jieba
 
 # 加载停用词
 with open("../stop_words.utf8", encoding="utf8") as f:
     stopword_list = f.readlines()
 
+
+
 def tokenize_text(text):
-    tokens = jieba.cut(text)
+    tokens = jieba.lcut(text)
     tokens = [token.strip() for token in tokens]
     return tokens
 
@@ -34,14 +35,11 @@ def remove_stopwords(text):
     return filtered_text
 
 
-def normalize_corpus(corpus, tokenize=False):
+def normalize_corpus(corpus):
     normalized_corpus = []
     for text in corpus:
-        text = remove_special_characters(text)
-        text = remove_stopwords(text)
+
+        text =" ".join(jieba.lcut(text))
         normalized_corpus.append(text)
-        if tokenize:
-            text = tokenize_text(text)
-            normalized_corpus.append(text)
 
     return normalized_corpus

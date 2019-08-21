@@ -21,7 +21,6 @@ jpype.startJVM(jpype.getDefaultJVMPath(), "-ea", "-Djava.class.path=%s" %(jarpat
 
 #jpype.startJVM(a, "-Djava.class.path=D:\\liepin_project\\seg_lib\\ins-segmentation-0.0.1-jar-with-dependencies.jar")
 HanLP = JClass('com.hankcs.hanlp.HanLP')
-#print(HanLP.newSegment().seg('你好，欢迎在Python中调用HanLP的API'))
 
 testCases = [
     "商品和服务",

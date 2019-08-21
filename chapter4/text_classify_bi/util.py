@@ -4,8 +4,8 @@
 # @Author: Michael.liu
 # @Date:2019/2/12
 
-PosPath = "../../data/chapter3/example1/ham_data.txt"
-NegPath = "../../data/chapter3/example1/spam_data.txt"
+PosPath = "../../data/chapter4/example1/ham_data.txt"
+NegPath = "../../data/chapter4/example1/spam_data.txt"
 import codecs
 import numpy as np
 
