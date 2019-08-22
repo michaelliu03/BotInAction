@@ -105,7 +105,7 @@ def plot_clusters(num_clusters, feature_matrix,
     # build cluster plotting data
     cluster_color_map = {}
     cluster_name_map = {}
-    for cluster_num, cluster_details in cluster_data[0:].items():
+    for cluster_num, cluster_details in cluster_data[:].items():
         # assign cluster features to unique label
         cluster_color_map[cluster_num] = generate_random_color()
         cluster_name_map[cluster_num] = ', '.join(cluster_details['key_features'][:5]).strip()
