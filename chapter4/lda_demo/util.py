@@ -1,13 +1,14 @@
 #!/usr/bin/env python
 #-*-coding:utf-8-*-
-# @File:Segment.py
-# @Author: Michael.liu
-# @Date:2019/2/12
+
 import  jieba
 import re
 import pandas as pd
 import codecs
 import string
+
+
+# 说明： 这里的预处理比较粗糙，只进行了分词。可以把文本的预处理做的相对复杂一些！
 
 corpus_path = u"../../data/chapter4/example3/lda_corpus.txt"
 corpus_save_path = u"../../data/chapter4/example3/lda_corpus_seg.csv"

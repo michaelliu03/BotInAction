@@ -18,7 +18,12 @@ def binomial_distribution(_n,_p,_k):
     binomial = stats.binom.pmf(k, n, p)
     #print(binomial)
 
-    plt.hist(binomial, bins=8, color='g', alpha=0.4, edgecolor='b')
+    plt.plot(k, binomial, 'o-')
+    plt.title('binomial:n=%i,p=%.2f' % (n, p), fontsize=15)
+    plt.xlabel('number of success')
+    plt.ylabel('probalility of success', fontsize=15)
+    plt.grid(True)
+
     plt.show()
 
 #泊松分布
