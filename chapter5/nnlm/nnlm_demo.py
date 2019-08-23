@@ -4,12 +4,9 @@
 
 import tensorflow as tf
 import numpy as np
-from chapter5.nnlm.util import read_corpus
+from chapter5.util import read_corpus
 tf.reset_default_graph()
-corpus_path = u"../../data/chapter4/example4/jobtitle_title_JD_seg.txt"
-sentences = read_corpus(corpus_path)
-#sentences = [ "i like dog", "i love coffee", "i hate milk"]
-#sentences =["我 爱 北京", "我 爱 祖国" , "我 喜欢 你"]
+sentences =["我 爱 北京", "我 去过 中国" , "我 喜欢 你"]
 
 
 
@@ -21,7 +18,7 @@ n_class = len(word_dict) # number of Vocabulary
 
 # NNLM Parameter
 n_step = 2 # number of steps ['i like', 'i love', 'i hate']
-n_hidden = 2 # number of hidden units
+n_hidden = 5 # number of hidden units
 
 def make_batch(sentences):
     input_batch = []
