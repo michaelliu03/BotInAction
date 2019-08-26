@@ -19,8 +19,8 @@ config.gpu_options.allow_growth = True
 config.gpu_options.per_process_gpu_memory_fraction =0.333
 
 parser = argparse.ArgumentParser(description='BiLSTM-CRF for Chinese NER task')
-parser.add_argument('--train_data',type=str,default='data_path',help='train data source')
-parser.add_argument('--test_data', type=str, default='data_path', help='test data source')
+parser.add_argument('--train_data',type=str,default='data_path',help='train_org data source')
+parser.add_argument('--test_data', type=str, default='data_path', help='test_org data source')
 parser.add_argument('--batch_size', type=int, default=64, help='#sample of each minibatch')
 parser.add_argument('--epoch', type=int, default=40, help='#epoch of training')
 parser.add_argument('--hidden_dim', type=int, default=300, help='#dim of hidden state')
@@ -33,8 +33,8 @@ parser.add_argument('--update_embedding', type=str2bool, default=True, help='upd
 parser.add_argument('--pretrain_embedding', type=str, default='random', help='use pretrained char embedding or init it randomly')
 parser.add_argument('--embedding_dim', type=int, default=300, help='random init char embedding_dim')
 parser.add_argument('--shuffle', type=str2bool, default=True, help='shuffle training data before each epoch')
-parser.add_argument('--mode', type=str, default='demo', help='train/test/demo')
-parser.add_argument('--demo_model', type=str, default='1521112368', help='model for test and demo')
+parser.add_argument('--mode', type=str, default='demo', help='train_org/test_org/demo')
+parser.add_argument('--demo_model', type=str, default='1521112368', help='model for test_org and demo')
 args = parser.parse_args()
 
 
@@ -57,7 +57,7 @@ if args.mode != 'demo':
 
 ## paths setting
 paths = {}
-timestamp = str(int(time.time())) if args.mode == 'train' else args.demo_model
+timestamp = str(int(time.time())) if args.mode == 'train_org' else args.demo_model
 output_path = os.path.join('.', args.train_data+"_save", timestamp)
 if not os.path.exists(output_path): os.makedirs(output_path)
 summary_path = os.path.join(output_path, "summaries")
@@ -76,22 +76,22 @@ get_logger(log_path).info(str(args))
 
 
 ## training model
-if args.mode == 'train':
+if args.mode == 'train_org':
     model = BiLSTM_CRF(args, embeddings, tag2label, word2id, paths, config=config)
     model.build_graph()
 
-    ## train model on the whole training data
-    print("train data: {}".format(len(train_data)))
+    ## train_org model on the whole training data
+    print("train_org data: {}".format(len(train_data)))
     model.train(train=train_data, dev=test_data)
 
 ## testing model
-elif args.mode == 'test':
+elif args.mode == 'test_org':
     ckpt_file = tf.train.latest_checkpoint(model_path)
     print(ckpt_file)
     paths['model_path'] = ckpt_file
     model = BiLSTM_CRF(args, embeddings, tag2label, word2id, paths, config=config)
     model.build_graph()
-    print("test data: {}".format(test_size))
+    print("test_org data: {}".format(test_size))
     model.test(test_data)
 
 ## demo

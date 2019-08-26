@@ -186,7 +186,7 @@ class BiLSTM_CRF(object):
              if step + 1 == num_batches:
                  saver.save(sess,self.model_path,global_step=step_num)
 
-        self.logger.info('==================validation /test================')
+        self.logger.info('==================validation /test_org================')
         label_list_dev, seq_len_list_dev = self.dev_one_epoch(sess,dev)
         self.evaluate(label_list_dev,seq_len_list_dev,dev,epoch)
 
@@ -238,7 +238,7 @@ class BiLSTM_CRF(object):
             for i in range(len(sent)):
                 sent_res.append([sent[i],tag[i],tag_[i]])
             model_predict.append(sent_res)
-        epoch_num = str(epoch + 1) if epoch != None else 'test'
+        epoch_num = str(epoch + 1) if epoch != None else 'test_org'
         label_path = os.path.join(self.result_path,'label_' + epoch_num)
         metric_path = os.path.join(self.result_path,'result_metric_' + epoch_num)
         for _ in conlleval(model_predict,label_path,metric_path):
