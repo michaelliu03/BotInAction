@@ -1,0 +1,12 @@
+{
+    "embedding_dim": 600,
+    "batch_size": 256,
+    "dropout_keep_prob": 0.8,
+    "hidden_size": 400,
+    "maxlength": 200,
+    "min_count": 4,
+    "l2_reg_lambda": 0.002,
+    "num_epochs": 15,
+    "attention_size": 50,
+    "test_train_ratio": 0.2
+}
