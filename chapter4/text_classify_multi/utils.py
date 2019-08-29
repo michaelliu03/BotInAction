@@ -83,7 +83,6 @@ def load_train_data(maxlen,min_count,trainpath):
     #print(all_.head(5))
     print(all_['words'].head(5))
 
-
     content = []
     for i in all_['words']:
         content.extend(i)
@@ -154,5 +153,5 @@ def load_train_data(maxlen,min_count,trainpath):
     #for item2 in train_data:
     #  print(item2)
 
-
-load_train_data(200,4,trainfilepath)
+if __name__ == "__main__":
+    load_train_data(200,4,trainfilepath)
