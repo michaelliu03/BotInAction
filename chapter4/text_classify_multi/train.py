@@ -100,7 +100,7 @@ print (y_hat.shape[1])
 with tf.Session() as sess:
     sess.run(tf.global_variables_initializer())
     merged = tf.summary.merge_all()
-    #   writer = tf.summary.FileWriter('./train_track/',sess.graph)
+    writer = tf.summary.FileWriter('./train_track/',sess.graph)
     print("Start learning...")
     for epoch in range(num_epochs):
         loss_train = 0
@@ -120,12 +120,12 @@ with tf.Session() as sess:
                                                                             seq_len_ph: seq_len,
                                                                             keep_prob_ph: keep_prob})
             accuracy_train += acc
-            # summary_train += summary_tr
+            #summary_train += summary_tr
             loss_train = loss_tr * delta + loss_train * (1 - delta)
-        #    writer.add_summary(summary_tr,epoch*num_batches + b)
+            writer.add_summary(summary_tr,epoch*num_batches + b)
         #    print(alpha_values)
         accuracy_train /= num_batches
-        # summary_train /= num_batches
+        #summary_train /= num_batches
 
         # Validating
         num_batches = X_test.shape[0] / batch_size
@@ -139,8 +139,8 @@ with tf.Session() as sess:
         accuracy_test /= num_batches
         loss_test /= num_batches
 
-        #  writer.add_summary(summary_tr,epoch)
-        #  writer.add_summary(accuracy_test,epoch)
+        writer.add_summary(summary_tr,epoch)
+        writer.add_summary(accuracy_test,epoch)
 
         print("loss: {:.3f}, val_loss: {:.3f}, acc: {:.3f}, val_acc: {:.3f}".format(
             loss_train, loss_test, accuracy_train, accuracy_test
