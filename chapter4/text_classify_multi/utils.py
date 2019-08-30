@@ -75,9 +75,36 @@ def output_labels(labeels):
     with open('../../model/chapter4/example2/label.json','w') as outfile:
         json.dump(labeels,outfile,indent=4)
 
+def batch_generator(X, y, batch_size):
+    size = X.shape[0]
+    X_copy = X.copy()
+    y_copy = y.copy()
+    indices = np.arange(size)
+    np.random.shuffle(indices)
+    X_copy = X_copy[indices]
+    y_copy = y_copy[indices]
+    i = 0
+    while True:
+        if i + batch_size <= size:
+            yield X_copy[i:i + batch_size], y_copy[i:i + batch_size]
+            i += batch_size
+        else:
+            i = 0
+            indices = np.arange(size)
+            np.random.shuffle(indices)
+            X_copy = X_copy[indices]
+            y_copy = y_copy[indices]
+            continue
 
+def train_test_split(x,y,test_size):
+    test_len = int(x.shape[0]*test_size)
+    x_test = x[:test_len]
+    x_train = x[test_len:]
+    y_test = y[:test_len]
+    y_train = y[test_len:]
+    return x_train, x_test, y_train, y_test
 
-def load_train_data(maxlen,min_count,trainpath):
+def load_train_data(maxlen,min_count,trainpath,test_train_ratio):
     all_ = pd.read_excel(trainpath, header=None)
     all_['words'] = all_[1].apply(lambda s: list(tokenize_text(s)))
     #print(all_.head(5))
@@ -117,8 +144,8 @@ def load_train_data(maxlen,min_count,trainpath):
     #print(label_dict)
     y_train = np.array(all_[0].apply(lambda y:label_dict[y]).tolist())
     print(y_train)
-
-    return (x_train,y_train),vocabulary_size,maxlen
+    x_train, x_test, y_train, y_test = train_test_split(x_train, y_train, test_train_ratio)
+    return (x_train, y_train), (x_test, y_test), vocabulary_size, maxlen
 
 
 
