@@ -75,6 +75,14 @@ def output_labels(labeels):
     with open('../../model/chapter4/example2/label.json','w') as outfile:
         json.dump(labeels,outfile,indent=4)
 
+def output_prediction_labels(labels):
+    with open('../../model/chapter4/example2/prediction_labels.json','w') as outfile:
+        json.dump(labels,outfile,ensure_ascii=False,indent=4)
+
+def output_attention_weights(attentions):
+    with open('../../model/chapter4/example2/attetion_weights','w') as outfile:
+        json.dump(attentions,outfile,ensure_ascii=False,indent =4)
+
 def batch_generator(X, y, batch_size):
     size = X.shape[0]
     X_copy = X.copy()
@@ -92,6 +100,22 @@ def batch_generator(X, y, batch_size):
             i = 0
             indices = np.arange(size)
             np.random.shuffle(indices)
+            X_copy = X_copy[indices]
+            y_copy = y_copy[indices]
+            continue
+
+def prediction_batch_generator(X, y, batch_size):
+    size = X.shape[0]
+    X_copy = X.copy()
+    y_copy = y.copy()
+    indices = np.arange(size)
+    i = 0
+    while True:
+        if i + batch_size <= size:
+            yield X_copy[i:i + batch_size], y_copy[i:i + batch_size]
+            i += batch_size
+        else:
+            i = 0
             X_copy = X_copy[indices]
             y_copy = y_copy[indices]
             continue
@@ -179,6 +203,39 @@ def load_train_data(maxlen,min_count,trainpath,test_train_ratio):
     #    print(item)
     #for item2 in train_data:
     #  print(item2)
+def load_data_prediction(maxlen, min_count,test_path):
+    all_ = pd.read_excel(test_path, header=None)
+    all_['words'] = all_[1].apply(lambda s: list(tokenize_text(s)))
+    print(all_['words'].head(5))
+
+    words_index = json.loads(open('../../model/chapter4/example2/vocabulary.json').read())
+    labels = json.loads(open('../../model/chapter4/example2/label.json').read())
+    abc = pd.Series(words_index)
+
+    def doc2numpre(s, maxlen):
+        s = [i for i in s if i in abc.index]
+        s = s[:maxlen - 1] + ['']*max(1, maxlen-len(s))
+        return list(abc[s])
+    print('one hot conversion')
+    all_['doc2num'] = all_['words'].apply(lambda s: doc2numpre(s, maxlen))
+
+    vocabulary_size = len(words_index) - 1
+    x_train = np.array(list(all_['doc2num']))
+    num_labels = len(labels)
+    one_hot = np.zeros((num_labels, num_labels), int)
+    np.fill_diagonal(one_hot, 1)
+    label_dict = dict(zip(labels, one_hot))
+
+    y_train = np.array(all_[0].apply(lambda y: label_dict[y]).tolist())
+   # print(x_train,y_train)
+    return x_train, y_train, vocabulary_size, maxlen, all_[0], num_labels
+
+def axis_sum(confusion_mat,k,num_labels):
+    sum_all = 0.0
+    for i in range(0,num_labels):
+        sum_all += confusion_mat[i][k]
+    return sum_all
 
 if __name__ == "__main__":
-    load_train_data(200,4,trainfilepath)
+    #load_train_data(200,4,trainfilepath)
+    load_data_prediction(200,4,testfilepath)
