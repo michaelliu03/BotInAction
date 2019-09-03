@@ -19,10 +19,10 @@ from chapter4.text_classify_multi.attention import attention
 
 trainfilepath = "../../data/chapter4/example2/train/train.xlsx"
 testfilepath = "../../data/chapter4/example2/test/test.xlsx"
-training_config_path = u"D:\\liuyu\\桌面\\git\\BotInAction\\chapter4\\text_classify_multi\\training_config.json"
+#training_config_path = u"D:\\liuyu\\桌面\\git\\BotInAction\\chapter4\\text_classify_multi\\training_config.json"
 
 # Read parameters
-training_config = training_config_path #sys.argv[1]
+training_config = sys.argv[1]
 params = json.loads(open(training_config).read())
 
 embed_dim = params['embedding_dim']
