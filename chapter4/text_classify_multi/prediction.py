@@ -26,9 +26,11 @@ batch_size = params['batch_size']
 num_epochs = params['num_epochs']
 min_count = params['min_count']
 
+
+
 X_test, y_test, vocabulary_size, sequence_length, x_list, num_labels = load_data_prediction(maxlength, min_count)
 
-model_checkpoint_path = './model/comments_sentiment_model.ckpt'
+#model_checkpoint_path = '../model/comments_sentiment_model.ckpt'
 
 # Different placeholders
 batch_ph = tf.placeholder(tf.int32, [None, sequence_length])
@@ -98,6 +100,9 @@ print(y_test.shape[1])
 
 # inputs = tf.split(embedded, sequence_length, 1)
 # **********************************************************************************************************
+gpu_config = tf.ConfigProto()
+gpu_config.gpu_options.per_process_gpu_memory_fraction = 0.5
+session = tf.Session(config=gpu_config)
 
 with tf.Session() as sess:
     # sess.run(tf.global_variables_initializer())
@@ -105,7 +110,7 @@ with tf.Session() as sess:
     accuracy_test = 0
     loss_test = 0
     saver = tf.train.Saver(tf.global_variables())
-    saver.restore(sess, model_checkpoint_path)
+    #saver.restore(sess, model_checkpoint_path)
     labels = json.loads(open('./model/labels_index.json').read())
     wb = xlwt.Workbook()
     ws = wb.add_sheet('question')
@@ -156,22 +161,22 @@ with tf.Session() as sess:
     print(confusion_mat)
 
     for prediction in pres_all:
-        #        print(prediction)
+        print(prediction)
         predict_labels.append(labels[prediction])
     #    output_attention_weights(alpha)
 
-    for i in range(0, len(pres_all)):
-        #    print(j)
-        if (j == 0):
-            ws.write(j, 0, "Comments")
-            ws.write(j, 1, "Original sentiment")
-            ws.write(j, 2, "Predicted sentiment")
-        else:
-            ws.write(j, 0, x_list[i])
-            ws.write(j, 1, labels[y_all[i]])
-            ws.write(j, 2, labels[pres_all[i]])
-        j += 1
-    print("acc: {:.3f}".format(accuracy_test))
+    # for i in range(0, len(pres_all)):
+    #     #    print(j)
+    #     if (j == 0):
+    #         ws.write(j, 0, "Comments")
+    #         ws.write(j, 1, "Original sentiment")
+    #         ws.write(j, 2, "Predicted sentiment")
+    #     else:
+    #         ws.write(j, 0, x_list[i])
+    #         ws.write(j, 1, labels[y_all[i]])
+    #         ws.write(j, 2, labels[pres_all[i]])
+    #     j += 1
+    # print("acc: {:.3f}".format(accuracy_test))
 
     #   output_prediction_labels(predict_labels)
-    wb.save('./model/gru_comment_sentiment_prediction.xls')
+    wb.save('../model/gru_comment_sentiment_prediction.xls')
