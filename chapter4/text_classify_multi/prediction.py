@@ -10,8 +10,9 @@ from tensorflow.python.ops.rnn import bidirectional_dynamic_rnn as bi_rnn
 from tensorflow.python.ops import array_ops
 import xlwt
 
-from chapter4.text_classify_multi.attention import attention
-from chapter4.text_classify_multi.utils import *
+from attention import attention
+from utils import *
+testfilepath = "../../data/chapter4/example2/test/test.xlsx"
 
 training_config = sys.argv[1]
 params = json.loads(open(training_config).read())
@@ -26,11 +27,9 @@ batch_size = params['batch_size']
 num_epochs = params['num_epochs']
 min_count = params['min_count']
 
+X_test, y_test, vocabulary_size, sequence_length, x_list, num_labels = load_data_prediction(maxlength, min_count,testfilepath)
 
-
-X_test, y_test, vocabulary_size, sequence_length, x_list, num_labels = load_data_prediction(maxlength, min_count)
-
-#model_checkpoint_path = '../model/comments_sentiment_model.ckpt'
+#model_checkpoint_path = './model/product_1.ckpt'
 
 # Different placeholders
 batch_ph = tf.placeholder(tf.int32, [None, sequence_length])
@@ -77,7 +76,7 @@ correct_predictions = tf.equal(predictions, tf.argmax(target_ph, 1))
 accuracy = tf.reduce_mean(tf.cast(correct_predictions, tf.float32))
 
 # Batch generators
-batch_size = 256
+batch_size = 64
 train_batch_generator = prediction_batch_generator(X_test, y_test, batch_size)
 
 saver = tf.train.Saver()
@@ -100,28 +99,29 @@ print(y_test.shape[1])
 
 # inputs = tf.split(embedded, sequence_length, 1)
 # **********************************************************************************************************
+
 gpu_config = tf.ConfigProto()
-gpu_config.gpu_options.per_process_gpu_memory_fraction = 0.5
+gpu_config.gpu_options.per_process_gpu_memory_fraction=0.5
 session = tf.Session(config=gpu_config)
 
 with tf.Session() as sess:
-    # sess.run(tf.global_variables_initializer())
+    sess.run(tf.global_variables_initializer())
     # sess.run(tf.global_variables_initializer())
     accuracy_test = 0
     loss_test = 0
     saver = tf.train.Saver(tf.global_variables())
     #saver.restore(sess, model_checkpoint_path)
-    labels = json.loads(open('./model/labels_index.json').read())
+    labels = json.loads(open('../../model/chapter4/example2/label.json').read())
     wb = xlwt.Workbook()
-    ws = wb.add_sheet('question')
+    ws = wb.add_sheet('Category')
     wq = wb.add_sheet('AccRecall')
     predict_labels, pres = [], []
     pres_all, y_all, correct_pres_all = [], [], []
     j = 0
-    num_batches = X_test.shape[0] / batch_size
+    num_batches = X_test.shape[0] // batch_size
     #    seq_len = np.array([list(x).index(0) + 1 for x in X_test])  # actual lengths of sequences
     for b in range(num_batches):
-        x_batch, y_batch = train_batch_generator.next()
+        x_batch, y_batch = train_batch_generator.__next__()
         seq_len = np.array([list(x).index(0) + 1 for x in x_batch])
         acc, alpha_all, pres, correct_pres, y = sess.run([accuracy, alpha, predictions, correct_predictions, y_ori],
                                                          feed_dict={batch_ph: x_batch, target_ph: y_batch,
@@ -146,7 +146,7 @@ with tf.Session() as sess:
             ws.write(i, 2, "Accuracy")
             ws.write(i, 3, "F1")
             ws.write(i, 4, "Amount")
-        else:
+        #else:
             k = i - 1
             wq.write(i, 0, labels[k])
             if (sum(confusion_mat[k][:]) != 0):
@@ -161,22 +161,22 @@ with tf.Session() as sess:
     print(confusion_mat)
 
     for prediction in pres_all:
-        print(prediction)
+       # print(prediction)
         predict_labels.append(labels[prediction])
     #    output_attention_weights(alpha)
 
-    # for i in range(0, len(pres_all)):
-    #     #    print(j)
-    #     if (j == 0):
-    #         ws.write(j, 0, "Comments")
-    #         ws.write(j, 1, "Original sentiment")
-    #         ws.write(j, 2, "Predicted sentiment")
-    #     else:
-    #         ws.write(j, 0, x_list[i])
-    #         ws.write(j, 1, labels[y_all[i]])
-    #         ws.write(j, 2, labels[pres_all[i]])
-    #     j += 1
-    # print("acc: {:.3f}".format(accuracy_test))
+    for i in range(0, len(pres_all)):
+        # print(j)
+        #if (j == 0):
+        #    ws.write(j, 0, "Comments")
+        #    ws.write(j, 1, "Original sentiment")
+        #    ws.write(j, 2, "Predicted sentiment")
+        #else:
+        ws.write(j, 0, x_list[i])
+        ws.write(j, 1, labels[y_all[i]])
+        ws.write(j, 2, labels[pres_all[i]])
+        j += 1
+    print("acc: {:.3f}".format(accuracy_test))
 
     #   output_prediction_labels(predict_labels)
     wb.save('../model/gru_comment_sentiment_prediction.xls')
