@@ -9,12 +9,18 @@ from tensorflow.python.ops.rnn import dynamic_rnn as rnn
 from tensorflow.python.ops.rnn import bidirectional_dynamic_rnn as bi_rnn
 from tensorflow.python.ops import array_ops
 import xlwt
+import numpy as np
+import json
 
 from attention import attention
 from utils import *
-testfilepath = "../../data/chapter4/example2/test/test.xlsx"
 
-training_config = sys.argv[1]
+#from text_classify_multi.utils import axis_sum
+
+testfilepath = "../../data/chapter4/example2/test/test.xlsx"
+model_checkpoint_path = './model/product_one_million_second_cate.ckpt'
+
+training_config = "D:\\liuyu\\桌面\\git\\BotInAction\\chapter4\\text_classify_multi\\training_config.json" #sys.argv[1]
 params = json.loads(open(training_config).read())
 
 embed_dim = params['embedding_dim']
@@ -105,34 +111,35 @@ gpu_config.gpu_options.per_process_gpu_memory_fraction=0.5
 session = tf.Session(config=gpu_config)
 
 with tf.Session() as sess:
-    sess.run(tf.global_variables_initializer())
-    # sess.run(tf.global_variables_initializer())
     accuracy_test = 0
     loss_test = 0
-    saver = tf.train.Saver(tf.global_variables())
+    #saver = tf.train.Saver(tf.global_variables())
     #saver.restore(sess, model_checkpoint_path)
     labels = json.loads(open('../../model/chapter4/example2/label.json').read())
     wb = xlwt.Workbook()
-    ws = wb.add_sheet('Category')
+    ws = wb.add_sheet('question')
     wq = wb.add_sheet('AccRecall')
     predict_labels, pres = [], []
-    pres_all, y_all, correct_pres_all = [], [], []
+    pres_all, y_all, correct_pres_all, y_out_all = [], [], [], []
     j = 0
     num_batches = X_test.shape[0] // batch_size
-    #    seq_len = np.array([list(x).index(0) + 1 for x in X_test])  # actual lengths of sequences
+
+    # run prediction model with all the batchs
     for b in range(num_batches):
         x_batch, y_batch = train_batch_generator.__next__()
         seq_len = np.array([list(x).index(0) + 1 for x in x_batch])
-        acc, alpha_all, pres, correct_pres, y = sess.run([accuracy, alpha, predictions, correct_predictions, y_ori],
-                                                         feed_dict={batch_ph: x_batch, target_ph: y_batch,
-                                                                    seq_len_ph: seq_len, keep_prob_ph: 1.0})
+        acc, alpha_all, pres, correct_pres, y, y_out = sess.run(
+            [accuracy, alpha, predictions, correct_predictions, y_ori, y_hat],
+            feed_dict={batch_ph: x_batch, target_ph: y_batch,
+                       seq_len_ph: seq_len, keep_prob_ph: 1.0})
         pres_all.extend(pres)
         y_all.extend(y)
+        y_out_all.extend(y_out)
         correct_pres_all.extend(correct_pres)
         accuracy_test += acc
     accuracy_test = accuracy_test / num_batches
     confusion_mat = np.zeros((num_labels, num_labels), float)
-
+    # establish the confusion matix for recall, accuracy calcuation
     for i in range(0, len(pres_all)):
         confusion_mat[pres_all[i]][y_all[i]] += 1
 
@@ -141,12 +148,12 @@ with tf.Session() as sess:
         acc = 0.0
         f1 = 0.0
         if (i == 0):
-            ws.write(i, 0, "Category")
-            ws.write(i, 1, "Recall")
-            ws.write(i, 2, "Accuracy")
-            ws.write(i, 3, "F1")
-            ws.write(i, 4, "Amount")
-        #else:
+            wq.write(i, 0, "Category")
+            wq.write(i, 1, "Recall")
+            wq.write(i, 2, "Accuracy")
+            wq.write(i, 3, "F1")
+            wq.write(i, 4, "Amount")
+        else:
             k = i - 1
             wq.write(i, 0, labels[k])
             if (sum(confusion_mat[k][:]) != 0):
@@ -158,25 +165,36 @@ with tf.Session() as sess:
             wq.write(i, 3, f1)
             wq.write(i, 4, axis_sum(confusion_mat, k, num_labels))
 
+    #        wq.write(i,0,labels[i])
+    #        if(sum(confusion_mat[i][:])!=0):
+    #             recall = confusion_mat[i,i]/sum(confusion_mat[i][:])
+    #             acc = confusion_mat[i,i]/axis_sum(confusion_mat,i,num_labels)
+    #        print(recall)
+    #        print(acc)
+    #        wq.write(i,1,recall)
+    #        wq.write(i,2,acc)
+    #        wq.write(i,3,axis_sum(confusion_mat,i,num_labels))
+
     print(confusion_mat)
 
     for prediction in pres_all:
-       # print(prediction)
         predict_labels.append(labels[prediction])
-    #    output_attention_weights(alpha)
-
-    for i in range(0, len(pres_all)):
-        # print(j)
-        #if (j == 0):
-        #    ws.write(j, 0, "Comments")
-        #    ws.write(j, 1, "Original sentiment")
-        #    ws.write(j, 2, "Predicted sentiment")
-        #else:
-        ws.write(j, 0, x_list[i])
-        ws.write(j, 1, labels[y_all[i]])
-        ws.write(j, 2, labels[pres_all[i]])
-        j += 1
+    # save all the bad cases with mismatch
+    for i in range(0, len(correct_pres_all)):
+        if (correct_pres_all[i] == False):
+            if (j == 0):
+                ws.write(j, 0, "Comments")
+                ws.write(j, 1, "Original label")
+                ws.write(j, 2, "Predicted label")
+                ws.write(j, 3, "Confidence")
+                ws.write(j, 4, "Index")
+            else:
+                ws.write(j, 0, x_list[i])
+                ws.write(j, 1, labels[y_all[i]])
+                ws.write(j, 2, labels[pres_all[i]])
+                ws.write(j, 3, str(y_out_all[i][pres_all[i]]))
+                ws.write(j, 4, i)
+            j += 1
     print("acc: {:.3f}".format(accuracy_test))
 
-    #   output_prediction_labels(predict_labels)
-    wb.save('../model/gru_comment_sentiment_prediction.xls')
+    wb.save('../model/lstm_wrong_predition_halpM.xls')
