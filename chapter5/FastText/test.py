@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 #-*-coding:utf-8-*-
 import tensorflow as tf
-
+import os,sys
 from chapter5.FastText.utils import  *
+
 def test_model(sess, graph, x_, y_):
     """
     :param sess:
@@ -34,11 +35,13 @@ def test(vocab_dir,test_dir,max_length):
     word_to_id, id_to_word = word_2_id(vocab_dir)
     cat_to_id, id_to_cat = cat_2_id()
     x_test, y_test = process_file(test_dir, word_to_id, cat_to_id, max_length)
-    graph_path = "./model/chapter5/fast/model-40000.meta"
-    model_path = "./model/chapter5/fast"
+    graph_path = "../../model/chapter5/fast/model-28000.meta"
+    model_path = "../../model/chapter5/fast"
     graph = tf.Graph()
     saver = tf.train.import_meta_graph(graph_path, graph=graph)
     sess = tf.Session(graph=graph)
     saver.restore(sess, tf.train.latest_checkpoint(model_path))
     test_loss, test_acc = test_model(sess, graph, x_test, y_test)
     print("Test loss: %f, Test acc: %f" %(test_loss, test_acc))
+
+

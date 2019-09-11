@@ -1,14 +1,24 @@
 #!/usr/bin/env python
 #-*-coding:utf-8-*-
-import os
 
-import os
+
+import os,sys
 from datetime import datetime
 import tensorflow as tf
+import json
 
 from chapter5.FastText.utils import  *
+from chapter5.FastText.test import *
 
 os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
+
+# Read parameters
+training_config = u"D:\\liuyu\\桌面\\git\\BotInAction\\chapter5\\FastText\\training_config.json"#sys.argv[1]
+params = json.loads(open(training_config).read())
+
+embed_dim = params['embedding_dim']
+num_epochs = params['num_epochs']
+test_train_ratio = params['test_train_ratio']
 
 
 class FastText():
@@ -23,7 +33,7 @@ class FastText():
         self.seq_length = seq_length
         self.num_classes = num_classes
         self.vocab_size = vocab_size
-        self.embedding_dim = 128
+        self.embedding_dim = embed_dim
 
         self.input_x = tf.placeholder(tf.int32, [None, self.seq_length], name='input_x')
         self.input_y = tf.placeholder(tf.float32, [None, self.num_classes], name='input_y')
@@ -97,7 +107,7 @@ def main():
     x_train, y_train = process_file(train_dir, word_to_id, cat_to_id, max_length)
     x_val, y_val = process_file(val_dir, word_to_id, cat_to_id, max_length)
 
-    epochs = 30
+    epochs = num_epochs
     best_acc_val = 0.0  # 最佳验证集准确率
     train_steps = 0
     val_loss = 0.0
@@ -131,7 +141,7 @@ def main():
                         # 保存最好结果
                         best_acc_val = val_acc
                         last_improved = train_steps
-                        saver.save(sess, "./model/chapter5/fast/model", global_step=train_steps)
+                        saver.save(sess, "../../model/chapter5/fast/model", global_step=train_steps)
                         # saver.save(sess=session, save_path=save_path)
                         improved_str = '*'
                     else:
@@ -150,16 +160,16 @@ def main():
 if __name__ == "__main__":
     base_dir = "../../data/chapter5/FastText/"
     train_dir = os.path.join(base_dir, 'cnews.train.txt')
-    test_dir = os.path.join(base_dir, 'cnews_test.txt')
+    test_dir = os.path.join(base_dir, 'cnews.test.txt')
     val_dir = os.path.join(base_dir, 'cnews.val.txt')
     vocab_dir = os.path.join(base_dir, 'cnews.vocab.txt')
 
     vocab_size = 5000
     max_length = 512
 
-    if not os.path.exists(vocab_dir):
-        build_vocab(train_dir, vocab_dir, vocab_size)
+    # if not os.path.exists(vocab_dir):
+    #     build_vocab(train_dir, vocab_dir, vocab_size)
 
-    main()
-    #test()
+    #main()
+    test(vocab_dir, test_dir, max_length)
 
