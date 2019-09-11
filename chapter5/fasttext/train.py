@@ -7,13 +7,13 @@ from datetime import datetime
 import tensorflow as tf
 import json
 
-from chapter5.FastText.utils import  *
-from chapter5.FastText.test import *
+from chapter5.fasttext.utils import  *
+from chapter5.fasttext.test import *
 
 os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
 # Read parameters
-training_config = u"D:\\liuyu\\桌面\\git\\BotInAction\\chapter5\\FastText\\training_config.json"#sys.argv[1]
+training_config = u"D:\\liuyu\\桌面\\git\\BotInAction\\chapter5\\fasttext\\training_config.json"#sys.argv[1]
 params = json.loads(open(training_config).read())
 
 embed_dim = params['embedding_dim']
@@ -158,7 +158,7 @@ def main():
 
 
 if __name__ == "__main__":
-    base_dir = "../../data/chapter5/FastText/"
+    base_dir = "../../data/chapter5/fasttext/"
     train_dir = os.path.join(base_dir, 'cnews.train.txt')
     test_dir = os.path.join(base_dir, 'cnews.test.txt')
     val_dir = os.path.join(base_dir, 'cnews.val.txt')
