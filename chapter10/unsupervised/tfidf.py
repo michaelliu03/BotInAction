@@ -15,7 +15,7 @@ class TfidfModel(object):
         self.low_freq_word = low_freq_word
 
         self.query_to_question = {support["query_id"]:support["question_id"] for support in supports}
-        self.question_id_to_answer, self.question_id_to_question = self.get_question_toanswer(supports)
+        self.question_id_to_answer, self.question_id_to_question = self.get_question_to_answer(supports)
         self.queries = {support["query_id"]:support["query"] for support in supports}
         self.queries_token = {query_id: self.get_tokens(query,n_gram = n_gram) for query_id,query in self.queries.items()}
         self.dictionary,self.tfidf_model,self.sim_model = self.get_tfidf_model()
