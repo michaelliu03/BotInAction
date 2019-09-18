@@ -5,11 +5,11 @@ from datetime import datetime
 import tensorflow as tf
 import json
 
-from util import  *
+from utils import  *
 from test import *
 
 # Read parameters
-training_config = sys.argv[1]
+training_config = u"D:\\liuyu\\桌面\\git\\BotInAction\\chapter5\\textcnn\\training_config.json"#sys.argv[1]
 params = json.loads(open(training_config).read())
 
 embed_dim = params['embedding_dim']
@@ -178,5 +178,5 @@ if __name__ =='__main__':
     print("begin train...")
     if not os.path.exists(vocab_dir):
         build_vocab(train_dir,vocab_dir,vocab_size)
-    #main()
-    test(vocab_dir,test_dir,max_length,grap_path,model_path)
+    main()
+    #test(vocab_dir,test_dir,max_length,grap_path,model_path)
