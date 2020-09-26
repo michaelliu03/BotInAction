@@ -1,2 +1,2 @@
-tensorflow==0.10.0rc0
+tensorflow==1.15.4
 jieba
